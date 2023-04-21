@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.CustomTheme" parent="Theme.AppCompat.NoActionBar">
+        <!-- Customize colors -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="android:windowBackground">@android:color/white</item>
+        <item name="android:navigationBarColor">@color/chat_green</item>
+
+        <!-- Customize back arrow button -->
+        <item name="homeAsUpIndicator">@drawable/backspace</item>
+        <item name="android:navigationIcon">@drawable/backspace</item>
+    </style>
+
+    <!-- Customize toolbar style -->
+    <style name="CustomToolbar" parent="Widget.MaterialComponents.Toolbar">
+        <item name="android:background">@android:color/white</item>
+        <item name="titleTextColor">@android:color/black</item>
+    </style>
+</resources>
