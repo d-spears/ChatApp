@@ -1,5 +1,6 @@
 package com.example.chatapp
 
+import android.app.Activity
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
@@ -14,6 +15,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -31,9 +33,7 @@ import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-
 class ImagePreview : AppCompatActivity() {
-
     private lateinit var bind: ImageLayoutBinding
     private lateinit var selfieImage: PreviewView
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
@@ -41,24 +41,24 @@ class ImagePreview : AppCompatActivity() {
     private lateinit var imageCapture: ImageCapture
     private lateinit var imgCaptureExecutor: ExecutorService
     private var menuIcon: ImageView? = null
+    private lateinit var resultLauncher: ActivityResultLauncher<Intent>
     private var imageUri: Uri? = null
+    private lateinit var toolbar: Toolbar
     private lateinit var outputDirectory: File
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         bind = ImageLayoutBinding.inflate(layoutInflater)
         setContentView(bind.root)
-        val toolbar: Toolbar = findViewById(R.id.image_toolbar)
+        toolbar = findViewById(R.id.image_toolbar)
 
         setSupportActionBar(toolbar)
-
-        selfieImage = findViewById(R.id.selfie_camera_preview)
-
+        toolbar.hideOverflowMenu()
         supportActionBar?.title = "Choose A New Image"
         supportActionBar?.setDisplayHomeAsUpEnabled(true) // arrow in toolbar
         supportActionBar?.setDisplayShowTitleEnabled(true) // title in the toolbar
 
+        selfieImage = findViewById(R.id.selfie_camera_preview)
         outputDirectory = getOutputDirectory()
 
         cameraProviderFuture = ProcessCameraProvider.getInstance(this)
@@ -82,6 +82,24 @@ class ImagePreview : AppCompatActivity() {
         val selfiePhoto: Button = findViewById(R.id.selfie_button)
         selfiePhoto.setOnClickListener {
             captureImage()
+        }
+
+        resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data = result.data
+                if (data != null && data.data != null) {
+                    this.imageUri = data.data
+                    val sharedPrefs = getSharedPreferences("my_prefs", Context.MODE_PRIVATE)
+                    val editor = sharedPrefs.edit()
+                    editor.putString("image_uri", imageUri.toString())
+                    editor.apply()
+                    /*Glide.with(this)
+                        .load(sharedPrefs.getString("image_uri", null))
+                        .circleCrop()
+                        .placeholder(R.drawable.user)
+                        .into(menuIcon!!)*/
+                }
+            }
         }
 
     }
@@ -109,22 +127,6 @@ class ImagePreview : AppCompatActivity() {
         return super.onPrepareOptionsMenu(menu)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        val sharedPrefs = getSharedPreferences("my_prefs", Context.MODE_PRIVATE)
-        val imageUri = sharedPrefs.getString("image_uri", null)
-        if (imageUri != null && menuIcon != null) {
-            val savedIconUri = Uri.parse(imageUri)
-            menuIcon?.visibility = View.GONE
-            Glide.with(this)
-                .load(savedIconUri.path)
-                .circleCrop()
-                .placeholder(R.drawable.user)
-                .into(menuIcon!!)
-
-        }
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
@@ -135,7 +137,7 @@ class ImagePreview : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
-    private fun startCamera() {
+    private fun startCamera(lensFacing: Int = CameraSelector.LENS_FACING_BACK) {
         val preview: PreviewView = findViewById(R.id.selfie_camera_preview)
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
@@ -145,7 +147,7 @@ class ImagePreview : AppCompatActivity() {
             imageCapture = ImageCapture.Builder().build()
             try {
                 cameraProvider.unbindAll()
-                val cameraSelector = CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_FRONT).build()
+                cameraSelector = CameraSelector.Builder().requireLensFacing(lensFacing).build()
                 cameraProvider.bindToLifecycle(this as LifecycleOwner, cameraSelector, previewShow, imageCapture)
             } catch (e: Exception) {
                 Log.e(TAG, "Error starting camera: ${e.message}", e)

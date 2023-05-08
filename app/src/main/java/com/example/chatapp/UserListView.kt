@@ -38,6 +38,7 @@ class ChatListView : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowTitleEnabled(true)
+        supportActionBar?.title = "Users List"
 
         mFirebaseDatabase = FirebaseDatabase.getInstance().getReference("chatters")
         initializeRecyclerView()
