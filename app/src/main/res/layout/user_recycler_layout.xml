@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/profile_layout"
+    android:id="@+id/user_recycler_layout"
     android:layout_width="match_parent"
     android:background="#dbe6e3"
     android:layout_height="match_parent"
-    tools:context=".ProfileActivity">
+    tools:context=".activity.UserListViewActivity">
 
     <include
-        android:id="@+id/chat_toolbar"
+        android:id="@+id/user_toolbar"
         layout="@layout/toolbar_layout"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/chat_toolbar"
+        app:layout_constraintTop_toBottomOf="@id/user_toolbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
         <androidx.recyclerview.widget.RecyclerView
@@ -26,4 +25,3 @@
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>

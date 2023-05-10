@@ -8,17 +8,14 @@
     android:background="#dbe6e3">
 
     <include
-        android:id="@+id/chat_list_toolbar"
-        layout="@layout/toolbar_layout"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:id="@+id/chat_page_toolbar"
+        layout="@layout/toolbar_layout"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/message_list"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/chat_list_toolbar"
+        app:layout_constraintTop_toBottomOf="@id/chat_page_toolbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/message_input_layout"/>

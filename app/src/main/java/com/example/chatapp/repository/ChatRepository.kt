@@ -1,41 +1,18 @@
 package com.example.chatapp.repository
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import com.example.chatapp.model.ChatData
+import com.example.chatapp.model.MessageData
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 
 class ChatRepository {
-    private val database = FirebaseDatabase.getInstance().reference
+    private val database = FirebaseDatabase.getInstance().getReference("Messages")
 
-    fun getChatData(chatId: String): LiveData<ChatData> {
-        val liveData = MutableLiveData<ChatData>()
-
-        database.child("chatters").child(chatId).addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val userData = snapshot.getValue(ChatData::class.java)
-                if (userData != null) {
-                    liveData.value = userData!!
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.e(TAG, "Failed to retrieve chat data", error.toException())
-            }
-        })
-
-        return liveData
+    fun getMessage(messageId: String): Task<DataSnapshot> {
+        return database.child(messageId).get()
     }
-
-    fun sendMessage(chatId: String, message: String) {
-        database.child("chatters").child(chatId).push().setValue(message)
-    }
-
-    companion object {
-        private const val TAG = "ChatRepository"
+    fun sendMessage(message: MessageData) {
+        database.push().setValue(message)
     }
 }

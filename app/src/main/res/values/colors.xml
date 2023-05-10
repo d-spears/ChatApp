@@ -8,4 +8,9 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="chat_green">#337c63</color>
+    <color name="chat_grey">#C8CCCA</color>
+
+    <color name="message_bubble_color">#FFC107</color>
+    <color name="message_bubble_stroke_color">#FFA000</color>
+
 </resources>

@@ -1,13 +1,17 @@
 package com.example.chatapp.adapter
 
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.chatapp.R
 import com.example.chatapp.model.MessageData
+import com.google.firebase.auth.FirebaseAuth
 
 class MessageAdapter(private val messages: MutableList<MessageData>) :
     RecyclerView.Adapter<MessageAdapter.MessageViewHolder>() {
@@ -34,29 +38,34 @@ class MessageAdapter(private val messages: MutableList<MessageData>) :
     override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
         val message = messages[position]
         holder.messageText.text = message.messageText
+
+        if (message.senderId == "currentUserId") {
+            // Message was sent by the current user
+            holder.userImage.visibility = View.GONE
+            holder.messageText.gravity = Gravity.END
+        } else {
+            // Message was received by the current user
+            holder.userImage.visibility = View.VISIBLE
+            holder.messageText.gravity = Gravity.START
+        }
     }
 
 
     override fun getItemViewType(position: Int): Int {
-        return if (messages[position].senderId == "currentUserId") {
+        return if (messages[position].senderId == FirebaseAuth.getInstance().currentUser?.uid) {
             SENT_MESSAGE
         } else {
             RECEIVED_MESSAGE
         }
     }
 
+
     override fun getItemCount(): Int {
         return messages.size
     }
 
-    fun updateList(newMessages: List<MessageData>) {
-        messages.clear()
-        messages.addAll(newMessages)
-        notifyDataSetChanged()
-    }
-
-    fun addMessage(newMessage: MessageData) {
-        messages.add(newMessage)
+    fun addMessage(message: MessageData) {
+        messages.add(message)
         notifyItemInserted(messages.size - 1)
     }
 }

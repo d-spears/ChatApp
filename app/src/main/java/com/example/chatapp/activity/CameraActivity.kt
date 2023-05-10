@@ -1,11 +1,9 @@
-package com.example.chatapp
+package com.example.chatapp.activity
 
 import android.app.Activity
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -23,9 +21,9 @@ import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.lifecycle.LifecycleOwner
 import com.bumptech.glide.Glide
+import com.example.chatapp.R
 import com.example.chatapp.databinding.ImageLayoutBinding
 import com.google.android.material.snackbar.Snackbar
 import com.google.common.util.concurrent.ListenableFuture
@@ -33,7 +31,7 @@ import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class ImagePreview : AppCompatActivity() {
+class CameraActivity : AppCompatActivity() {
     private lateinit var bind: ImageLayoutBinding
     private lateinit var selfieImage: PreviewView
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
@@ -130,7 +128,7 @@ class ImagePreview : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                val intent = Intent(this@ImagePreview, ProfileActivity::class.java)
+                val intent = Intent(this@CameraActivity, ProfileActivity::class.java)
                 startActivity(intent)
                 true
             }
@@ -175,14 +173,14 @@ class ImagePreview : AppCompatActivity() {
                         sharedPrefs.edit().putString("image_uri", savedUri.toString()).apply()
 
                         // show the saved image in the menu icon
-                        Glide.with(this@ImagePreview)
+                        Glide.with(this@CameraActivity)
                             .load(savedUri)
                             .circleCrop()
                             .placeholder(R.drawable.user)
                             .into(menuIcon!!)
 
                         // show a message that the image has been saved
-                        Toast.makeText(this@ImagePreview, "Image saved", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@CameraActivity, "Image saved", Toast.LENGTH_SHORT).show()
                     }
 
 

@@ -1,28 +1,28 @@
-package com.example.chatapp
+package com.example.chatapp.activity
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import com.example.chatapp.LoginActivity
 import com.example.chatapp.databinding.SignUpLayoutBinding
-import com.example.chatapp.model.ChatData
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.example.chatapp.factory.SignUpViewModelFactory
+import com.example.chatapp.repository.SignUpRepository
+import com.example.chatapp.viewmodel.SignUpViewModel
 
-class SignUp : AppCompatActivity() {
-
+class SignUpActivity : AppCompatActivity() {
     private lateinit var binding: SignUpLayoutBinding
-    private lateinit var mFirebaseDatabase: DatabaseReference
-    private lateinit var mAuth: FirebaseAuth
+    private lateinit var viewModel: SignUpViewModel
 
+    @SuppressLint("SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = SignUpLayoutBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        mFirebaseDatabase = FirebaseDatabase.getInstance().getReference("chatters")
-        mAuth = FirebaseAuth.getInstance()
+        viewModel = ViewModelProvider(this, SignUpViewModelFactory(SignUpRepository()))[SignUpViewModel::class.java]
 
         binding.signupButton.setOnClickListener {
             val name = binding.loginName.text.toString().trim()
@@ -35,28 +35,17 @@ class SignUp : AppCompatActivity() {
             } else if (password != confirmPassword) {
                 showErrorDialog("Passwords do not match.")
             } else {
-                mAuth.createUserWithEmailAndPassword(email, password)
-                    .addOnSuccessListener { authResult ->
-                        val userId = authResult.user?.uid
-                        val user = ChatData(userId!!, name, email, "")
-
-                        mFirebaseDatabase.child(userId).setValue(user)
-                            .addOnSuccessListener {
-                                //startActivity(Intent(this@SignUp, ChatListView::class.java))
-                                finish()
-                            }
-                            .addOnFailureListener {
-                                // Handle error
-                            }
+                val success = viewModel.signUp(name, email, password, confirmPassword)
+                    if (success) {
+                        finish()
+                    } else {
+                        showErrorDialog("Sign up failed. Please try again.")
                     }
-                    .addOnFailureListener {
-                        // Handle error
-                    }
+                }
             }
-        }
 
         binding.loginFalseButton.setOnClickListener {
-            startActivity(Intent(this@SignUp, Login::class.java))
+            startActivity(Intent(this, LoginActivity::class.java))
         }
     }
 

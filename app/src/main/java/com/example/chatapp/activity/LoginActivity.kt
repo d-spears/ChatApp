@@ -10,37 +10,37 @@ import android.widget.ProgressBar
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import com.example.chatapp.activity.SignUpActivity
+import com.example.chatapp.activity.UserListViewActivity
 import com.example.chatapp.databinding.LoginLayoutBinding
+import com.example.chatapp.factory.LoginViewModelFactory
+import com.example.chatapp.factory.SignUpViewModelFactory
+import com.example.chatapp.repository.LoginRepository
+import com.example.chatapp.repository.SignUpRepository
 import com.example.chatapp.viewmodel.ChatViewModel
+import com.example.chatapp.viewmodel.LoginViewModel
+import com.example.chatapp.viewmodel.SignUpViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 
-class Login : AppCompatActivity() {
-
+class LoginActivity : AppCompatActivity() {
     lateinit var binding: LoginLayoutBinding
-    private lateinit var mFirebaseDatabase: DatabaseReference
     private lateinit var mAuth: FirebaseAuth
     private lateinit var progressBar: ProgressBar
+    private lateinit var viewModel: LoginViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = DataBindingUtil.setContentView(this, R.layout.login_layout)
-        mFirebaseDatabase = FirebaseDatabase.getInstance().getReference("chatters")
         mAuth = FirebaseAuth.getInstance()
         progressBar = binding.loginProgressBar
-
         progressBar.visibility = View.GONE
-        // Obtain an instance of the ViewModel
-        val viewModel = ViewModelProvider(this).get(ChatViewModel::class.java)
 
-        // Set the ViewModel for the binding
-        binding.viewModel = viewModel
-
-
+        viewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
 
         binding.loginTrueButton.setOnClickListener {
             val email = binding.loginEmail.text.toString().trim()
@@ -50,33 +50,12 @@ class Login : AppCompatActivity() {
                 showErrorDialog("Please fill in all fields.")
             } else {
                 progressBar.visibility = View.VISIBLE
-                mAuth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(this) { task ->
-                        progressBar.visibility = View.GONE
-                        if (task.isSuccessful) {
-                            val currentUser = mAuth.currentUser
-                            startActivity(Intent(this, ChatListView::class.java))
-
-                        } else {
-                            val exception = task.exception
-                            when {
-                                exception is FirebaseAuthInvalidUserException -> {
-                                    showErrorDialog("User not found.")
-                                }
-                                exception is FirebaseAuthInvalidCredentialsException -> {
-                                    showErrorDialog("Email or password is incorrect.")
-                                }
-                                else -> {
-                                    Log.w(ContentValues.TAG, "signInWithEmail:failure", exception)
-                                }
-                            }
-                        }
-                    }
+                viewModel.signInWithEmailAndPassword(email, password)
             }
         }
 
         binding.signupButton.setOnClickListener {
-            val intent = Intent(this, SignUp::class.java)
+            val intent = Intent(this, SignUpActivity::class.java)
             startActivity(intent)
         }
     }
