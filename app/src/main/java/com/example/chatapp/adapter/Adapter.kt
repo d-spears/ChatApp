@@ -1,5 +1,6 @@
 package com.example.chatapp.adapter
 
+import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
@@ -13,13 +14,12 @@ import com.example.chatapp.activity.ChatActivity
 import com.example.chatapp.R
 import com.example.chatapp.model.User
 
-class Adapter(
-    private val context: Context,
-    private var users: HashMap<String, User>) : RecyclerView.Adapter<Adapter.ViewHolder>() {
-    private val inflater: LayoutInflater = LayoutInflater.from(context)
+class Adapter(private val context: Context) : RecyclerView.Adapter<Adapter.ViewHolder>() {
+
+    private val users = HashMap<String, User>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val itemView = inflater.inflate(R.layout.user_list, parent, false)
+        val itemView = LayoutInflater.from(context).inflate(R.layout.user_list, parent, false)
         return ViewHolder(itemView)
     }
 
@@ -40,14 +40,21 @@ class Adapter(
                 putExtra("firebaseToken", user.firebaseToken)
             }
             context.startActivity(intent)
+
         }
     }
 
     override fun getItemCount() = users.size
 
-    fun setData(users: HashMap<String, User>) {
-        this.users = users
+    fun setData(users: HashMap<String, User>, loggedInUserId: String) {
+        val filteredUsers = users.filterKeys { it != loggedInUserId }
+        this.users.clear()
+        this.users.putAll(filteredUsers)
         notifyDataSetChanged()
+    }
+
+    fun getUser(userId: String): User? {
+        return users[userId]
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

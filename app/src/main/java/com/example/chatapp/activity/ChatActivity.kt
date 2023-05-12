@@ -36,7 +36,6 @@ class ChatActivity : AppCompatActivity() {
         toolbar = findViewById(R.id.chat_page_toolbar)
         profileImageView = toolbar.findViewById(R.id.toolbar_image_view)
 
-
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowTitleEnabled(true)
@@ -62,13 +61,15 @@ class ChatActivity : AppCompatActivity() {
 
         // Set up listener for new messages
         val chatRepository = ChatRepository()
-        chatViewModel = ViewModelProvider(this, ChatViewModelFactory(chatRepository)).get(ChatViewModel::class.java)
+        chatViewModel = ViewModelProvider(this, ChatViewModelFactory(chatRepository))[ChatViewModel::class.java]
 
-        chatViewModel.getMessageData(FirebaseAuth.getInstance().currentUser?.uid ?: "", receiverId).observe(this) { messageData ->
-            if (messageData != null) {
+        chatViewModel.getMessageData(FirebaseAuth.getInstance().currentUser?.uid ?: "", receiverId).observe(this) { messageDataList ->
+            if (messageDataList != null) {
                 bind.messageList.adapter?.let { adapter ->
                     if (adapter is MessageAdapter) {
-                        adapter.addMessage(messageData)
+                        messageDataList.forEach { messageData ->
+                            adapter.addMessage(messageData)
+                        }
                     }
                 }
             }

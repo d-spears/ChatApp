@@ -6,7 +6,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.example.chatapp.LoginActivity
 import com.example.chatapp.databinding.SignUpLayoutBinding
 import com.example.chatapp.factory.SignUpViewModelFactory
 import com.example.chatapp.repository.SignUpRepository
@@ -35,12 +34,13 @@ class SignUpActivity : AppCompatActivity() {
             } else if (password != confirmPassword) {
                 showErrorDialog("Passwords do not match.")
             } else {
-                val success = viewModel.signUp(name, email, password, confirmPassword)
-                    if (success) {
+                viewModel.signUp(name, email, password, confirmPassword){
+                    if (it == "success") {
                         finish()
                     } else {
-                        showErrorDialog("Sign up failed. Please try again.")
+                        showErrorDialog(it)
                     }
+                }
                 }
             }
 

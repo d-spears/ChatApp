@@ -1,30 +1,19 @@
-package com.example.chatapp
+package com.example.chatapp.activity
 
-import android.content.ContentValues
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import com.example.chatapp.activity.SignUpActivity
-import com.example.chatapp.activity.UserListViewActivity
+import com.example.chatapp.R
 import com.example.chatapp.databinding.LoginLayoutBinding
 import com.example.chatapp.factory.LoginViewModelFactory
-import com.example.chatapp.factory.SignUpViewModelFactory
 import com.example.chatapp.repository.LoginRepository
-import com.example.chatapp.repository.SignUpRepository
-import com.example.chatapp.viewmodel.ChatViewModel
 import com.example.chatapp.viewmodel.LoginViewModel
-import com.example.chatapp.viewmodel.SignUpViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.auth.FirebaseAuthInvalidUserException
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 
 class LoginActivity : AppCompatActivity() {
     lateinit var binding: LoginLayoutBinding
@@ -40,7 +29,7 @@ class LoginActivity : AppCompatActivity() {
         progressBar = binding.loginProgressBar
         progressBar.visibility = View.GONE
 
-        viewModel = ViewModelProvider(this).get(LoginViewModel::class.java)
+        viewModel = ViewModelProvider(this, LoginViewModelFactory(LoginRepository()))[LoginViewModel::class.java]
 
         binding.loginTrueButton.setOnClickListener {
             val email = binding.loginEmail.text.toString().trim()
@@ -50,7 +39,15 @@ class LoginActivity : AppCompatActivity() {
                 showErrorDialog("Please fill in all fields.")
             } else {
                 progressBar.visibility = View.VISIBLE
-                viewModel.signInWithEmailAndPassword(email, password)
+                viewModel.signInWithEmailAndPassword(email, password){
+                    progressBar.visibility = View.GONE
+                    if (it){
+                        val intent = Intent(this, UserListViewActivity::class.java)
+                        startActivity(intent)
+                    }else{
+
+                    }
+                }
             }
         }
 

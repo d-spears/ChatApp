@@ -20,24 +20,29 @@ class ChatViewModel(private val repository: ChatRepository) : ViewModel() {
     private val database = FirebaseDatabase.getInstance().getReference("Messages")
     lateinit var topic: String
 
-    fun getMessageData(senderID: String, receiverID: String): LiveData<MessageData> {
-        val messageData = MutableLiveData<MessageData>()
-        database.addValueEventListener(
+    fun getMessageData(senderID: String, receiverID: String): LiveData<List<MessageData>> {
+        val messageData = MutableLiveData<List<MessageData>>()
+        database.orderByChild("timestamp").addValueEventListener(
             object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    for(dataSnapshot: DataSnapshot in snapshot.children){
+                    val messages = mutableListOf<MessageData>()
+                    for (dataSnapshot: DataSnapshot in snapshot.children) {
                         val messageSend = dataSnapshot.getValue(MessageData::class.java)
                         if (messageSend != null) {
-                            if( (messageSend.senderId == senderID && messageSend.receiverId == receiverID) ||
-                                messageSend.senderId == receiverID && messageSend.receiverId == senderID){
-                                messageData.value = messageSend!!
+                            if ((messageSend.senderId == senderID && messageSend.receiverId == receiverID) ||
+                                (messageSend.senderId == receiverID && messageSend.receiverId == senderID)
+                            ) {
+                                messages.add(messageSend)
                             }
                         } else {
                             Log.e(TAG, "Error: messageSend is null")
                         }
                     }
+                    messageData.value = messages
                 }
+
                 override fun onCancelled(error: DatabaseError) {
+                    Log.e(TAG, "Error: $error")
                 }
             })
         return messageData
@@ -57,7 +62,7 @@ class ChatViewModel(private val repository: ChatRepository) : ViewModel() {
             try {
                 val response = RetrofitInstance.api.postNotification(notification)
                 if(response.isSuccessful) {
-                   // Log.d("TAG", "Response: ${Gson().toJson(response)}")
+                    // works well
                 } else {
                     Log.e("TAG", response.errorBody()!!.string())
                 }
