@@ -43,6 +43,12 @@ class UserListViewActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true) // arrow in toolbar
         supportActionBar?.setDisplayShowTitleEnabled(true) // title in the toolbar
 
+        profileImageView = toolbar.findViewById(R.id.toolbar_image_view) // initialize profileImageView
+        profileImageView.setOnClickListener {
+            val intent = Intent(this, ProfileActivity::class.java)
+            startActivity(intent)
+        }
+
         recyclerView = bind.recyclerViewShow
         adapter = Adapter(this)
         recyclerView.adapter = adapter
@@ -61,29 +67,31 @@ class UserListViewActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu, menu)
-        profileImageView = menu.findItem(R.id.menu_item_one).actionView?.findViewById(R.id.menu_item_icon)!!
-        return true
-    }
-
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         menu ?: return super.onPrepareOptionsMenu(menu)
+        // Load the saved image URI from shared preferences
         val sharedPrefs = getSharedPreferences("my_prefs", Context.MODE_PRIVATE)
         val imageUri = sharedPrefs.getString("image_uri", null)
+
+        // If the URI exists, load the image into the toolbar image view
         if (imageUri != null && profileImageView != null) {
             val savedIconUri = Uri.parse(imageUri)
-            //toolbar image disappears when visibilty is Gone
-            profileImageView?.visibility = View.VISIBLE
+            profileImageView.visibility = View.VISIBLE // make the image view visible
             Glide.with(this)
                 .load(savedIconUri)
                 .circleCrop()
                 .placeholder(R.drawable.user)
-                .into(profileImageView!!)
+                .into(profileImageView)
+
+            // Set an OnClickListener to navigate to the profile activity
+            profileImageView.setOnClickListener {
+                val intent = Intent(this@UserListViewActivity, ProfileActivity::class.java)
+                startActivity(intent)
+            }
         }
+
         return super.onPrepareOptionsMenu(menu)
     }
-
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
