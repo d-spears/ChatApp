@@ -1,0 +1,16 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:layout_gravity="fill_horizontal"
+    android:padding="8dp">
+
+    <ImageView
+        android:id="@+id/user_profile_icon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_weight="1"
+        android:layout_gravity="end"
+        android:layout_marginStart="8dp" />
+
+</LinearLayout>
