@@ -15,11 +15,11 @@ android {
             keyPassword 'test123'
         }
     }
-    namespace 'com.example.chatapp'
+    namespace 'com.app.chatapp'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.chatapp"
+        applicationId "com.app.chatapp"
         minSdk 24
         targetSdk 33
         versionCode 1

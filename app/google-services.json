@@ -8,17 +8,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1051728303893:android:a1d67c61392e9feb933b1c",
+        "mobilesdk_app_id": "1:1051728303893:android:d0fdce9b89ea5f15933b1c",
         "android_client_info": {
-          "package_name": "com.example.chatapp"
+          "package_name": "com.app.chatapp"
         }
       },
       "oauth_client": [
         {
-          "client_id": "1051728303893-plu1pedk2cnf7nl77h5la9b9s8uncrs9.apps.googleusercontent.com",
+          "client_id": "1051728303893-9m444mh10hfn4gk35iqouve4mmjhg0mb.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.chatapp",
+            "package_name": "com.app.chatapp",
             "certificate_hash": "5e09fd0b6b651ed89cca96f4e79f5e2cffd7d2c6"
           }
         },
